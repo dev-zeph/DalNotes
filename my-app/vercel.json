@@ -1,5 +1,5 @@
 {
   "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/manifest.json", "dest": "/public/manifest.json" }
   ]
 }
