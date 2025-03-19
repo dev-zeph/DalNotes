@@ -1,24 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Homepage from "./pages/homepage";
+import Categories from "./pages/categories"; // ✅ Check this import
+import NotesDB from "./pages/notesdb";
+import Upload from "./pages/upload";
+import Header from "./pages/header"; 
+import Footer from "./pages/footer";
+
 
 function App() {
+  const [selectedCategory, setSelectedCategory] = useState("");
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          The begining of DalNotes.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Header /> {/* ✅ Add Header to enable navigation */}
+      <div id="home">
+        <Homepage />
+      </div>
+      <div id="categories">
+        <Categories onCategoryClick={setSelectedCategory} />
+      </div>
+      <div id="notes">
+        <NotesDB selectedCategory={selectedCategory} />
+      </div>
+      <div id="upload">
+        <Upload />
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
