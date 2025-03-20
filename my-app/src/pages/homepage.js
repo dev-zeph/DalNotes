@@ -7,9 +7,9 @@ const Homepage = () => {
       <div className="home-content">
         <div className="header-text">
           <h1>By Dalhousie Students - For  Dalhousie Students</h1>
-          <p>Welcome to Dalhousie Students Note Repository. Not affiliated with Dalhousie University.</p>
+          <p>Welcome to Dalhousie Students Note Repository.</p>
         </div>
-        <img className="home-image" src="notes.jpeg" alt="Writing Notebook" />
+        <img className="home-image" src="OurLogo.jpeg" alt="Writing Notebook" />
       </div>
     </section>
   );
