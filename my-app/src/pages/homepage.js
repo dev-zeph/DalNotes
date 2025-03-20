@@ -9,7 +9,7 @@ const Homepage = () => {
           <h1>By Dalhousie Students - For  Dalhousie Students</h1>
           <p>Welcome to Dalhousie Students Note Repository.</p>
         </div>
-        <img className="home-image" src="OurLogo.jpeg" alt="Writing Notebook" />
+        <img className="home-image" src="ourlogo.jpeg" alt="Writing Notebook" />
       </div>
     </section>
   );
