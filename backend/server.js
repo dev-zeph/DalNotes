@@ -1,22 +1,33 @@
 const express = require("express");
 const cors = require("cors");
+const multer = require("multer");
+const AWS = require("aws-sdk");
 require("dotenv").config();
 const pool = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Restrict CORS to your Vercel frontend
-const allowedOrigin = "https://dal-notes.vercel.app";
-app.use(cors({ origin: allowedOrigin }));
+// CORS setup
+app.use(cors({ origin: "https://dal-notes.vercel.app" }));
 app.use(express.json());
 
-// Test API Route
+// AWS S3 setup
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: "us-east-1", // Match your bucket region
+});
+
+// Multer setup (in-memory for S3 upload)
+const upload = multer({ storage: multer.memoryStorage() });
+
+// ✅ Test API Route
 app.get("/", (req, res) => {
   res.send("Welcome to DalNotes Backend API 🚀");
 });
 
-// Test Database Connection
+// ✅ Test Database Connection
 app.get("/test-db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW();");
@@ -34,7 +45,7 @@ app.get("/test-db", async (req, res) => {
   }
 });
 
-// Notes API Endpoint
+// ✅ Get Notes
 app.get("/api/notes", async (req, res) => {
   const page = parseInt(req.query["pagination[page]"]) || 1;
   const pageSize = parseInt(req.query["pagination[pageSize]"]) || 6;
@@ -80,6 +91,54 @@ app.get("/api/notes", async (req, res) => {
   }
 });
 
+// ✅ Upload Notes
+app.post("/api/notes", upload.single("file"), async (req, res) => {
+  const { title, course, author } = req.body;
+  const file = req.file;
+
+  if (!file || !title || !course || !author) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    // Upload to S3
+    const s3Params = {
+      Bucket: "dalnotes-bucket", // Replace with your bucket name
+      Key: `${Date.now()}-${file.originalname}`,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: "public-read", // Allow public downloads
+    };
+    const s3Result = await s3.upload(s3Params).promise();
+    const fileUrl = s3Result.Location;
+
+    // Save to database
+    const query = `
+      INSERT INTO note (title, course, author, file_url, created_at)
+      VALUES ($1, $2, $3, $4, NOW())
+      RETURNING *
+    `;
+    const values = [title, course, author, fileUrl];
+    const result = await pool.query(query, values);
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: result.rows[0].id,
+        Title: result.rows[0].title,
+        Course: result.rows[0].course,
+        Author: result.rows[0].author,
+        Date: result.rows[0].created_at,
+        File: [{ url: fileUrl }],
+      },
+    });
+  } catch (error) {
+    console.error("Error uploading note:", error);
+    res.status(500).json({ error: "Failed to upload note" });
+  }
+});
+
+// 🚀 Start the Server
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
 });
