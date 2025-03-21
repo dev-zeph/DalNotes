@@ -6,7 +6,11 @@ const pool = require("./db"); // Import PostgreSQL connection
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors());
+// Replace this with your Vercel frontend URL
+const allowedOrigin = "https://your-vercel-frontend.vercel.app"; // Update this later
+
+// Configure CORS to allow only your Vercel frontend
+app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
 // ✅ Test API Route
