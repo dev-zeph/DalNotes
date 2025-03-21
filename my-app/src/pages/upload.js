@@ -5,7 +5,7 @@ import "../App.css";
 const Upload = () => {
   const [formData, setFormData] = useState({
     file: null,
-    fileName: "Drag or Choose PDF", 
+    fileName: "Drag or Choose PDF",
     course: "",
     title: "",
     author: "",
@@ -13,14 +13,15 @@ const Upload = () => {
 
   const [uploading, setUploading] = useState(false);
 
+  const backendUrl = "https://dalnotes-production.up.railway.app"; // Railway backend
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    
     if (files) {
       setFormData((prev) => ({
         ...prev,
         file: files[0],
-        fileName: files[0] ? files[0].name : "Drag or Choose PDF", 
+        fileName: files[0] ? files[0].name : "Drag or Choose PDF",
       }));
     } else {
       setFormData((prev) => ({
@@ -32,7 +33,7 @@ const Upload = () => {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.file) {
       alert("Please select a file before uploading.");
       return;
@@ -41,31 +42,26 @@ const Upload = () => {
     setUploading(true);
 
     try {
-      const fileData = new FormData();
-      fileData.append("files", formData.file);
+      const uploadData = new FormData();
+      uploadData.append("file", formData.file);
+      uploadData.append("title", formData.title);
+      uploadData.append("course", formData.course);
+      uploadData.append("author", formData.author);
 
-      const fileUploadResponse = await axios.post(
-        "http://localhost:1337/api/upload",
-        fileData
-      );
-
-      const uploadedFile = fileUploadResponse.data[0];
-
-      
-      const noteData = {
-        data: {
-          Title: formData.title,
-          Course: formData.course,
-          Author: formData.author,
-          Date: new Date().toISOString(),
-          File: uploadedFile.id, 
+      await axios.post(`${backendUrl}/api/notes`, uploadData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-      };
-
-      await axios.post("http://localhost:1337/api/notes", noteData);
+      });
 
       alert("File uploaded successfully!");
-      setFormData({ file: null, fileName: "Drag or Choose PDF", course: "", title: "", author: "" }); 
+      setFormData({
+        file: null,
+        fileName: "Drag or Choose PDF",
+        course: "",
+        title: "",
+        author: "",
+      });
     } catch (error) {
       console.error("Upload failed:", error);
       alert("Error uploading file. Please try again.");
@@ -82,12 +78,11 @@ const Upload = () => {
       </div>
 
       <form className="upload-form" onSubmit={handleUpload}>
-        
         {/* Two-Column Input Layout */}
         <div className="form-grid">
           <label className="file-upload">
             {formData.fileName} {/* ✅ Display selected file name */}
-            <input type="file" name="file" onChange={handleChange} accept=".pdf"/>
+            <input type="file" name="file" onChange={handleChange} accept=".pdf" />
           </label>
 
           <div className="form-group">
