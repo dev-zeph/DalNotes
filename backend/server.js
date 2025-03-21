@@ -40,13 +40,13 @@ app.get("/api/notes", async (req, res) => {
   const offset = (page - 1) * pageSize;
 
   try {
-    // Fetch notes with pagination
+    // Fetch notes with pagination (changed "notes" to "note")
     const notesQuery = `
       SELECT id, title, course, author, created_at, file_url 
-      FROM notes 
+      FROM note 
       LIMIT $1 OFFSET $2
     `;
-    const countQuery = "SELECT COUNT(*) FROM notes";
+    const countQuery = "SELECT COUNT(*) FROM note"; // Changed here too
     
     const notesResult = await pool.query(notesQuery, [pageSize, offset]);
     const countResult = await pool.query(countQuery);
@@ -61,7 +61,7 @@ app.get("/api/notes", async (req, res) => {
         Title: note.title,      // Capitalized to match frontend
         Course: note.course,    // Capitalized to match frontend
         Author: note.author,    // Capitalized to match frontend
-        Date: note.created_at,  // Using created_at as Date to match frontend
+        Date: note.created_at,  // Using created_at as Date
         File: note.file_url ? [{ url: note.file_url }] : [], // Matches your column
       })),
       meta: {
