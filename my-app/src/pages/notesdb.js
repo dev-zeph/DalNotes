@@ -123,15 +123,16 @@ const NotesDB = ({ selectedCategory }) => {
               <h3>{note.Title}</h3>
               <p><strong>Course:</strong> {note.Course}</p>
               <p><strong>Author:</strong> {note.Author}</p>
-              <p><strong>Date:</strong> {note.Date}</p>
-              {note.documentId && (
+              <p><strong>Date:</strong> {new Date(note.Date).toLocaleDateString()}</p>
+              {note.File && note.File[0]?.url ? (
                 <button
                   onClick={() => handleDownload(note.File, note.Title)}
                   className="view-btn"
-                  disabled={!note.File || !note.File[0]}
                 >
-                  {note.File && note.File[0] ? "Download" : "Download (No file)"}
+                  Download
                 </button>
+              ) : (
+                <p>No file available</p>
               )}
             </div>
           ))
