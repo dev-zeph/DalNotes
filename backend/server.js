@@ -16,7 +16,7 @@ app.use(express.json());
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: "us-east-1", // Match your bucket region
+  region: "us-east-2", // Updated to match your bucket region
 });
 
 // Multer setup (in-memory for S3 upload)
@@ -103,7 +103,7 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
   try {
     // Upload to S3
     const s3Params = {
-      Bucket: "dalnotes-bucket", // Replace with your bucket name
+      Bucket: "dalnotes-buckets", // Your bucket name
       Key: `${Date.now()}-${file.originalname}`,
       Body: file.buffer,
       ContentType: file.mimetype,
