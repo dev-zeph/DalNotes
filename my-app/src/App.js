@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
+import { HashRouter as Router } from "react-router-dom";
 import Homepage from "./pages/homepage";
 import Categories from "./pages/categories"; // ✅ Check this import
 import NotesDB from "./pages/notesdb";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import "../App.css";
 
@@ -9,41 +9,14 @@ const NotesDB = ({ selectedCategory }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    fetchNotes(currentPage);
-  }, [currentPage]);
-
-  useEffect(() => {
-    if (selectedCategory) {
-      setSearchQuery(selectedCategory);
-      handleSearch(selectedCategory);
-    }
-  }, [selectedCategory]);
-
-  const fetchNotes = (page) => {
-    axios
-      .get(`http://localhost:1337/api/notes?pagination[page]=${page}&pagination[pageSize]=6&populate=File`)
-      .then((response) => {
-        console.log("API Response:", response.data); // Debug: Check the response
-        if (response.data.data) {
-          setNotes(response.data.data);
-          setFilteredNotes(response.data.data);
-          setTotalPages(response.data.meta.pagination.pageCount);
-        } else {
-          console.error("No data found in API response", response.data);
-        }
-      })
-      .catch((error) => console.error("Error fetching notes:", error));
-  };
-
-  const handleSearch = (query) => {
+  const handleSearch = useCallback((query) => {
     setSearchQuery(query);
 
     if (query) {
       axios
         .get("http://localhost:1337/api/notes?populate=File")
         .then((response) => {
-          console.log("Search API Response:", response.data); // Debug
+          console.log("Search API Response:", response.data);
           if (response.data.data) {
             const results = response.data.data.filter((note) =>
               note.Title.toLowerCase().includes(query.toLowerCase()) ||
@@ -57,6 +30,33 @@ const NotesDB = ({ selectedCategory }) => {
     } else {
       setFilteredNotes(notes);
     }
+  }, [notes]);
+
+  useEffect(() => {
+    fetchNotes(currentPage);
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (selectedCategory) {
+      setSearchQuery(selectedCategory);
+      handleSearch(selectedCategory);
+    }
+  }, [selectedCategory, handleSearch]);
+
+  const fetchNotes = (page) => {
+    axios
+      .get(`http://localhost:1337/api/notes?pagination[page]=${page}&pagination[pageSize]=6&populate=File`)
+      .then((response) => {
+        console.log("API Response:", response.data);
+        if (response.data.data) {
+          setNotes(response.data.data);
+          setFilteredNotes(response.data.data);
+          setTotalPages(response.data.meta.pagination.pageCount);
+        } else {
+          console.error("No data found in API response", response.data);
+        }
+      })
+      .catch((error) => console.error("Error fetching notes:", error));
   };
 
   const handleDownload = (file, title) => {
@@ -66,7 +66,7 @@ const NotesDB = ({ selectedCategory }) => {
     }
 
     const fileUrl = `http://localhost:1337${file[0].url}`;
-    console.log("Downloading from:", fileUrl); // Debug: Verify the URL
+    console.log("Downloading from:", fileUrl);
     axios({
       url: fileUrl,
       method: "GET",
@@ -118,7 +118,7 @@ const NotesDB = ({ selectedCategory }) => {
                 <button
                   onClick={() => handleDownload(note.File, note.Title)}
                   className="view-btn"
-                  disabled={!note.File || !note.File[0]} // Disable if no file
+                  disabled={!note.File || !note.File[0]}
                 >
                   {note.File && note.File[0] ? "Download" : "Download (No file)"}
                 </button>
