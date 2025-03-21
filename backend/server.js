@@ -1,21 +1,22 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const pool = require("./db"); // Import PostgreSQL connection
+const pool = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// CORS setup (we’ll lock it down with your Vercel URL later)
-app.use(cors());
+// Restrict CORS to your Vercel frontend
+const allowedOrigin = "https://dal-notes.vercel.app";
+app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
-// ✅ Test API Route
+// Test API Route
 app.get("/", (req, res) => {
   res.send("Welcome to DalNotes Backend API 🚀");
 });
 
-// ✅ Test Database Connection
+// Test Database Connection
 app.get("/test-db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW();");
@@ -33,20 +34,19 @@ app.get("/test-db", async (req, res) => {
   }
 });
 
-// ✅ Notes API Endpoint (mimicking Strapi structure)
+// Notes API Endpoint
 app.get("/api/notes", async (req, res) => {
   const page = parseInt(req.query["pagination[page]"]) || 1;
   const pageSize = parseInt(req.query["pagination[pageSize]"]) || 6;
   const offset = (page - 1) * pageSize;
 
   try {
-    // Fetch notes with pagination (changed "notes" to "note")
     const notesQuery = `
       SELECT id, title, course, author, created_at, file_url 
       FROM note 
       LIMIT $1 OFFSET $2
     `;
-    const countQuery = "SELECT COUNT(*) FROM note"; // Changed here too
+    const countQuery = "SELECT COUNT(*) FROM note";
     
     const notesResult = await pool.query(notesQuery, [pageSize, offset]);
     const countResult = await pool.query(countQuery);
@@ -54,15 +54,14 @@ app.get("/api/notes", async (req, res) => {
     const totalNotes = parseInt(countResult.rows[0].count);
     const totalPages = Math.ceil(totalNotes / pageSize);
 
-    // Format response to match Strapi
     const response = {
       data: notesResult.rows.map((note) => ({
         id: note.id,
-        Title: note.title,      // Capitalized to match frontend
-        Course: note.course,    // Capitalized to match frontend
-        Author: note.author,    // Capitalized to match frontend
-        Date: note.created_at,  // Using created_at as Date
-        File: note.file_url ? [{ url: note.file_url }] : [], // Matches your column
+        Title: note.title,
+        Course: note.course,
+        Author: note.author,
+        Date: note.created_at,
+        File: note.file_url ? [{ url: note.file_url }] : [],
       })),
       meta: {
         pagination: {
@@ -81,7 +80,6 @@ app.get("/api/notes", async (req, res) => {
   }
 });
 
-// 🚀 Start the Server
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
 });
