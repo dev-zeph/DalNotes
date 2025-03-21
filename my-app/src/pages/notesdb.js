@@ -9,32 +9,40 @@ const NotesDB = ({ selectedCategory }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const handleSearch = useCallback((query) => {
-    setSearchQuery(query);
+  const backendUrl = "https://dalnotes-production.up.railway.app"; // Railway backend
 
-    if (query) {
-      axios
-        .get("http://localhost:1337/api/notes?populate=File")
-        .then((response) => {
-          console.log("Search API Response:", response.data);
-          if (response.data.data) {
-            const results = response.data.data.filter((note) =>
-              note.Title.toLowerCase().includes(query.toLowerCase()) ||
-              note.Course.toLowerCase().includes(query.toLowerCase()) ||
-              note.Author.toLowerCase().includes(query.toLowerCase())
-            );
-            setFilteredNotes(results);
-          }
-        })
-        .catch((error) => console.error("Error fetching search results:", error));
-    } else {
-      setFilteredNotes(notes);
-    }
-  }, [notes]);
+  const handleSearch = useCallback(
+    (query) => {
+      setSearchQuery(query);
+
+      if (query) {
+        axios
+          .get(`${backendUrl}/api/notes?populate=File`)
+          .then((response) => {
+            console.log("Search API Response:", response.data);
+            if (response.data.data) {
+              const results = response.data.data.filter(
+                (note) =>
+                  note.Title.toLowerCase().includes(query.toLowerCase()) ||
+                  note.Course.toLowerCase().includes(query.toLowerCase()) ||
+                  note.Author.toLowerCase().includes(query.toLowerCase())
+              );
+              setFilteredNotes(results);
+            }
+          })
+          .catch((error) =>
+            console.error("Error fetching search results:", error)
+          );
+      } else {
+        setFilteredNotes(notes);
+      }
+    },
+    [notes, backendUrl]
+  );
 
   useEffect(() => {
     fetchNotes(currentPage);
-  }, [currentPage]);
+  }, [currentPage, backendUrl]);
 
   useEffect(() => {
     if (selectedCategory) {
@@ -45,7 +53,9 @@ const NotesDB = ({ selectedCategory }) => {
 
   const fetchNotes = (page) => {
     axios
-      .get(`http://localhost:1337/api/notes?pagination[page]=${page}&pagination[pageSize]=6&populate=File`)
+      .get(
+        `${backendUrl}/api/notes?pagination[page]=${page}&pagination[pageSize]=6&populate=File`
+      )
       .then((response) => {
         console.log("API Response:", response.data);
         if (response.data.data) {
@@ -65,7 +75,7 @@ const NotesDB = ({ selectedCategory }) => {
       return;
     }
 
-    const fileUrl = `http://localhost:1337${file[0].url}`;
+    const fileUrl = file[0].url; // Use the full URL from file_url
     console.log("Downloading from:", fileUrl);
     axios({
       url: fileUrl,
