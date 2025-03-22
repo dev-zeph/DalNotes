@@ -95,6 +95,24 @@ const NotesDB = ({ selectedCategory }) => {
       .catch((error) => console.error("Error downloading file:", error));
   };
 
+  const handleLike = async (noteId, liked) => {
+    try {
+      if (liked) {
+        await axios.delete(`${backendUrl}/api/notes/${noteId}/like`);
+      } else {
+        await axios.post(`${backendUrl}/api/notes/${noteId}/like`, {});
+      }
+      fetchNotes(currentPage); // Refresh notes after liking/unliking
+    } catch (error) {
+      console.error("Error liking/unliking note:", error);
+      console.error("Error details:", error.response?.data || error.message);
+      alert(
+        "Failed to update like: " +
+          (error.response?.data?.error || error.message)
+      );
+    }
+  };
+
   const goToPreviousPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
@@ -121,9 +139,25 @@ const NotesDB = ({ selectedCategory }) => {
           filteredNotes.map((note) => (
             <div key={note.id} className="note-card">
               <h3>{note.Title}</h3>
-              <p><strong>Course:</strong> {note.Course}</p>
-              <p><strong>Author:</strong> {note.Author}</p>
-              <p><strong>Date:</strong> {new Date(note.Date).toLocaleDateString()}</p>
+              <p>
+                <strong>Course:</strong> {note.Course}
+              </p>
+              <p>
+                <strong>Author:</strong> {note.Author}
+              </p>
+              <p>
+                <strong>Date:</strong>{" "}
+                {new Date(note.Date).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Likes:</strong> {note.LikesCount}
+              </p>
+              <button
+                onClick={() => handleLike(note.id, note.Liked)}
+                className={note.Liked ? "unlike-btn" : "like-btn"}
+              >
+                {note.Liked ? "Unlike" : "Like"}
+              </button>
               {note.File && note.File[0]?.url ? (
                 <button
                   onClick={() => handleDownload(note.File, note.Title)}
