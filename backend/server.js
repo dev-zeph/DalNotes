@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const AWS = require("aws-sdk");
-const jwt = require("express-jwt");
+const { expressJwt: jwt } = require("express-jwt");
 const jwksRsa = require("jwks-rsa");
 require("dotenv").config();
 const pool = require("./db");
