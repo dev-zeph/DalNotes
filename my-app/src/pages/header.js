@@ -1,24 +1,49 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import "../App.css";
 
 const Header = () => {
-  const handleScroll = (e, targetId) => {
-    e.preventDefault();
-    const targetElement = document.getElementById(targetId);
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  const location = useLocation(); // Get current route
 
   return (
     <header>
-      <nav>
-        <div className="logo">Dal Notes</div>
-        <ul>
-          <li><a href="#home" onClick={(e) => handleScroll(e, "home")}>Home</a></li>
-          <li><a href="#categories" onClick={(e) => handleScroll(e, "categories")}>Categories</a></li>
-          <li><a href="#notes" onClick={(e) => handleScroll(e, "notes")}>Notes</a></li>
-          <li><a href="#upload" onClick={(e) => handleScroll(e, "upload")}>Upload</a></li>
+      <nav className="navbar">
+        <div className="logo">
+          <Link to="/">Dal Notes</Link>
+        </div>
+        <ul className="navbar-links">
+          <li>
+            <Link
+              to="/"
+              className={location.pathname === "/" ? "active" : ""}
+            >
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/categories"
+              className={location.pathname === "/categories" ? "active" : ""}
+            >
+              Categories
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/notes"
+              className={location.pathname === "/notes" ? "active" : ""}
+            >
+              Notes
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/upload"
+              className={location.pathname === "/upload" ? "active" : ""}
+            >
+              Upload
+            </Link>
+          </li>
         </ul>
       </nav>
     </header>

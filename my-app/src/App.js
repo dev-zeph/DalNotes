@@ -1,30 +1,45 @@
 import React, { useState } from "react";
-import { HashRouter as Router } from "react-router-dom";
-import Homepage from "./pages/homepage";
-import Categories from "./pages/categories"; // ✅ Check this import
-import NotesDB from "./pages/notesdb";
-import Upload from "./pages/upload";
-import Header from "./pages/header"; 
-import Footer from "./pages/footer";
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Header from "./components/Header";
+import Homepage from "./components/Homepage";
+import NotesDB from "./components/NotesDB";
+import Upload from "./components/Upload";
+import Categories from "./components/Categories";
+import Footer from "./components/Footer";
+import "./App.css";
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+  };
+
   return (
     <Router>
-      <Header /> {/* ✅ Add Header to enable navigation */}
-      <div id="home">
-        <Homepage />
-      </div>
-      <div id="categories">
-        <Categories onCategoryClick={setSelectedCategory} />
-      </div>
-      <div id="notes">
-        <NotesDB selectedCategory={selectedCategory} />
-      </div>
-      <div id="upload">
-        <Upload />
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+          <Route
+            path="/categories"
+            element={
+              <Categories
+                onCategoryClick={handleCategoryClick}
+                selectedCategory={selectedCategory}
+              />
+            }
+          />
+          <Route
+            path="/notes"
+            element={
+              <NotesDB
+                selectedCategory={selectedCategory}
+              />
+            }
+          />
+          <Route path="/upload" element={<Upload />} />
+        </Routes>
         <Footer />
       </div>
     </Router>

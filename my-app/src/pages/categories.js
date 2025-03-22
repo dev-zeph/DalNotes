@@ -7,23 +7,44 @@ const Categories = ({ onCategoryClick, selectedCategory }) => {
 
   const handleCategoryClick = (category) => {
     onCategoryClick(category);
-    navigate("/categories");
+    navigate("/notes"); // Navigate to notes page to show filtered results
+  };
+
+  const handleClearSelection = () => {
+    onCategoryClick(""); // Clear the selected category
+    navigate("/notes"); // Navigate to notes page to show all notes
   };
 
   const categories = [
-    "Math", "Science", "English", "History", "Geography",
-    "Computer Science", "Business", "Health", "Politics", "Other"
+    "Math",
+    "Science",
+    "English",
+    "History",
+    "Geography",
+    "Computer Science",
+    "Business",
+    "Health",
+    "Politics",
+    "Other",
   ];
 
   return (
     <section id="categories" className="categories-section">
       <h2>Categories</h2>
       <div className="categories-grid">
-        {categories.map((category) => (
+        <button
+          className={`category-button ${selectedCategory === "" ? "selected" : ""}`}
+          onClick={handleClearSelection}
+          style={{ "--index": 0 }}
+        >
+          All Categories
+        </button>
+        {categories.map((category, index) => (
           <button
             key={category}
-            className={`category-button ${selectedCategory === category ? 'selected' : ''}`}
+            className={`category-button ${selectedCategory === category ? "selected" : ""}`}
             onClick={() => handleCategoryClick(category)}
+            style={{ "--index": index + 1 }}
           >
             {category}
           </button>

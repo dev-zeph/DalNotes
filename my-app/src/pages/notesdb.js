@@ -5,7 +5,7 @@ import "../App.css";
 const NotesDB = ({ selectedCategory }) => {
   const [notes, setNotes] = useState([]);
   const [filteredNotes, setFilteredNotes] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(selectedCategory || "");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -15,29 +15,28 @@ const NotesDB = ({ selectedCategory }) => {
     (query) => {
       setSearchQuery(query);
 
-      if (query) {
-        axios
-          .get(`${backendUrl}/api/notes?populate=File`)
-          .then((response) => {
-            console.log("Search API Response:", response.data);
-            if (response.data.data) {
-              const results = response.data.data.filter(
-                (note) =>
-                  note.Title.toLowerCase().includes(query.toLowerCase()) ||
-                  note.Course.toLowerCase().includes(query.toLowerCase()) ||
-                  note.Author.toLowerCase().includes(query.toLowerCase())
-              );
-              setFilteredNotes(results);
-            }
-          })
-          .catch((error) =>
-            console.error("Error fetching search results:", error)
-          );
-      } else {
-        setFilteredNotes(notes);
+      let filtered = notes;
+
+      // Filter by selectedCategory if it exists
+      if (selectedCategory) {
+        filtered = filtered.filter((note) =>
+          note.Category.toLowerCase() === selectedCategory.toLowerCase()
+        );
       }
+
+      // Further filter by search query if it exists
+      if (query) {
+        filtered = filtered.filter(
+          (note) =>
+            note.Title.toLowerCase().includes(query.toLowerCase()) ||
+            note.Course.toLowerCase().includes(query.toLowerCase()) ||
+            note.Author.toLowerCase().includes(query.toLowerCase())
+        );
+      }
+
+      setFilteredNotes(filtered);
     },
-    [notes, backendUrl]
+    [notes, selectedCategory]
   );
 
   useEffect(() => {
@@ -45,10 +44,7 @@ const NotesDB = ({ selectedCategory }) => {
   }, [currentPage, backendUrl]);
 
   useEffect(() => {
-    if (selectedCategory) {
-      setSearchQuery(selectedCategory);
-      handleSearch(selectedCategory);
-    }
+    handleSearch(searchQuery); // Re-filter when selectedCategory changes
   }, [selectedCategory, handleSearch]);
 
   const fetchNotes = (page) => {
@@ -141,6 +137,9 @@ const NotesDB = ({ selectedCategory }) => {
               <h3>{note.Title}</h3>
               <p>
                 <strong>Course:</strong> {note.Course}
+              </p>
+              <p>
+                <strong>Category:</strong> {note.Category}
               </p>
               <p>
                 <strong>Author:</strong> {note.Author}

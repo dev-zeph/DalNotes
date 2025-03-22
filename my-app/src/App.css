@@ -20,7 +20,7 @@ body {
   line-height: 1.6;
 }
 
-/* Header Styles */
+/* Header Styles (Navbar) */
 header {
   background-color: var(--primary-black);
   color: white;
@@ -31,7 +31,7 @@ header {
   box-shadow: var(--shadow); /* Subtle shadow for depth */
 }
 
-nav {
+.navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,19 +40,24 @@ nav {
   padding: 0 30px;
 }
 
-.logo {
+.navbar-logo {
   font-size: 28px; /* Larger logo */
   font-weight: 700;
   letter-spacing: 1px;
 }
 
-ul {
+.navbar-logo a {
+  color: white;
+  text-decoration: none;
+}
+
+.navbar-links {
   list-style: none;
   display: flex;
   gap: 25px; /* More spacing */
 }
 
-ul li a {
+.navbar-links li a {
   color: white;
   text-decoration: none;
   padding: 10px 20px;
@@ -61,13 +66,13 @@ ul li a {
   border-radius: 8px;
 }
 
-ul li a:hover {
+.navbar-links li a:hover {
   background: var(--primary-yellow);
   color: var(--primary-black);
 }
 
 /* Homepage Styles */
-.homepage {
+.hero-section {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -234,19 +239,6 @@ ul li a:hover {
   background-position: center center;
 }
 
-/* Responsive design for categories */
-@media (max-width: 768px) {
-  .categories-grid {
-    gap: 12px;
-  }
-  
-  .category-button {
-    padding: 12px 18px;
-    font-size: 14px;
-    min-width: 110px;
-  }
-}
-
 /* Animation for the category buttons */
 @keyframes fadeInUp {
   from {
@@ -275,6 +267,7 @@ ul li a:hover {
 .category-button:nth-child(8) { --index: 8; }
 .category-button:nth-child(9) { --index: 9; }
 .category-button:nth-child(10) { --index: 10; }
+
 /* Upload Section */
 .upload-container {
   max-width: 900px; /* Narrower for focus */
@@ -300,8 +293,6 @@ ul li a:hover {
   color: var(--text-gray);
   margin-bottom: 30px;
 }
-
-
 
 .form-grid {
   padding-left: 0; /* Remove unnecessary padding */
@@ -474,17 +465,49 @@ ul li a:hover {
   margin: 6px 0;
 }
 
+.note-card p strong {
+  color: #333;
+}
+
+.like-btn,
+.unlike-btn,
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  margin: 0.25rem 0.5rem 0 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.like-btn {
+  background-color: var(--primary-black);
+  color: white;
+}
+
+.like-btn:hover {
+  background-color: var(--primary-yellow);
+  color: var(--primary-black);
+  transform: translateY(-2px);
+}
+
+.unlike-btn {
+  background-color: #e8f0fe;
+  color: var(--primary-black);
+}
+
+.unlike-btn:hover {
+  background-color: #d1e0ff;
+  transform: translateY(-2px);
+}
+
 .view-btn {
   background-color: var(--primary-black);
   color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 15px;
-  transition: all 0.3s ease;
 }
 
 .view-btn:hover {
@@ -536,8 +559,6 @@ ul li a:hover {
   font-weight: 600;
   color: var(--primary-black);
 }
-
-/* Footer design starts here */
 
 /* Footer Styles */
 .site-footer {
@@ -605,7 +626,6 @@ ul li a:hover {
 .footer-section.links ul li a:hover {
   color: var(--primary-yellow);
   transform: translateX(5px);
-  color: black;
 }
 
 .contact-link {
@@ -651,41 +671,24 @@ ul li a:hover {
 
 .footer-policies a:hover {
   color: var(--primary-yellow);
-  
 }
-
-/* Responsive styling */
-@media (max-width: 768px) {
-  .footer-container {
-    flex-direction: column;
-    gap: 30px;
-  }
-  
-  .footer-bottom {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-/* Global Styles */
-/* Existing styles remain unchanged */
 
 /* Responsive Styles for Header */
 @media (max-width: 768px) {
-  nav {
+  .navbar {
     padding: 0 15px;
     flex-direction: column;
     gap: 15px;
   }
-  
-  ul {
+
+  .navbar-links {
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
     padding: 0;
   }
-  
-  ul li a {
+
+  .navbar-links li a {
     padding: 8px 15px;
     font-size: 14px;
   }
@@ -698,17 +701,17 @@ ul li a:hover {
     text-align: center;
     gap: 30px;
   }
-  
+
   .header-text {
     max-width: 100%;
     text-align: center;
   }
-  
+
   .header-text p {
     max-width: 100%;
     margin: 0 auto;
   }
-  
+
   .home-image {
     width: 80%;
     max-width: 400px;
@@ -719,13 +722,42 @@ ul li a:hover {
   .header-text h1 {
     font-size: 32px;
   }
-  
+
   .header-text p {
     font-size: 16px;
   }
-  
+
   .home-image {
     width: 90%;
+  }
+}
+
+/* Responsive Styles for Categories */
+@media (max-width: 768px) {
+  .categories-grid {
+    gap: 12px;
+  }
+
+  .category-button {
+    padding: 12px 18px;
+    font-size: 14px;
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-button {
+    padding: 10px 15px;
+    font-size: 13px;
+    min-width: 100px;
+  }
+
+  .categories-grid {
+    gap: 10px;
+  }
+
+  .categories-section h2 {
+    font-size: 26px;
   }
 }
 
@@ -735,23 +767,27 @@ ul li a:hover {
     padding: 20px 15px;
     margin: 40px auto;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .upload-header h1 {
     font-size: 26px;
   }
-  
+
   .upload-buttons {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .upload-btn,
   .cancel-btn {
+    width: 100%;
+  }
+
+  .form-group input {
     width: 100%;
   }
 }
@@ -768,23 +804,23 @@ ul li a:hover {
   .notes-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .search-input {
     max-width: 90%;
   }
-  
+
   .notes-section {
     padding: 50px 15px;
   }
-  
+
   .notes-section h2 {
     font-size: 26px;
   }
-  
+
   .pagination {
     gap: 10px;
   }
-  
+
   .pagination button {
     padding: 8px 15px;
     font-size: 13px;
@@ -794,19 +830,20 @@ ul li a:hover {
 /* Responsive Styles for Footer */
 @media (max-width: 768px) {
   .footer-container {
+    flex-direction: column;
     gap: 30px;
   }
-  
+
   .footer-section {
     min-width: 100%;
   }
-  
+
   .footer-bottom {
     flex-direction: column;
     text-align: center;
     gap: 15px;
   }
-  
+
   .footer-policies {
     justify-content: center;
     flex-wrap: wrap;
@@ -814,23 +851,48 @@ ul li a:hover {
   }
 }
 
-/* Additional responsive fixes */
-@media (max-width: 480px) {
-  .category-button {
-    padding: 10px 15px;
-    font-size: 13px;
-    min-width: 100px;
-  }
-  
-  .categories-grid {
-    gap: 10px;
-  }
-  
-  .categories-section h2 {
-    font-size: 26px;
-  }
-  
-  .form-group input {
-    width: 100%;
-  }
+.navbar-links li a.active {
+  background: var(--primary-yellow);
+  color: var(--primary-black);
+}
+
+.cta-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  background-color: var(--primary-black);
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+}
+
+.cta-btn:hover {
+  background-color: var(--primary-yellow);
+  color: var(--primary-black);
+  transform: translateY(-2px);
+}
+
+.category-button {
+  animation: fadeInUp 0.5s ease forwards;
+  animation-delay: calc(0.05s * var(--index, 0));
+}
+
+.form-group select {
+  width: 90%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  background-color: #fafafa;
+  transition: border-color 0.3s ease;
+}
+
+.form-group select:focus {
+  border-color: var(--primary-yellow);
+  outline: none;
+  box-shadow: 0 0 5px rgba(255, 212, 0, 0.3);
 }
