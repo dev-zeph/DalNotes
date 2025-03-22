@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3"); // Import AWS SDK v3
+const AWS = require("aws-sdk");
 require("dotenv").config();
 const pool = require("./db");
 
@@ -11,13 +11,10 @@ const PORT = process.env.PORT || 8080;
 app.use(cors({ origin: "https://dal-notes.vercel.app" }));
 app.use(express.json());
 
-// Configure S3 client with AWS SDK v3
-const s3Client = new S3Client({
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: "us-east-2",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
 });
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -109,9 +106,8 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
       ContentType: file.mimetype,
       ContentDisposition: `attachment; filename="${file.originalname}"`,
     };
-    const command = new PutObjectCommand(s3Params);
-    const s3Result = await s3Client.send(command);
-    const fileUrl = `https://${s3Params.Bucket}.s3.${s3Client.config.region}.amazonaws.com/${s3Params.Key}`;
+    const s3Result = await s3.upload(s3Params).promise();
+    const fileUrl = s3Result.Location;
     console.log("S3 upload successful:", fileUrl);
 
     console.log("Saving to database...");
