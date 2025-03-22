@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
-import Homepage from "./components/Homepage";
-import NotesDB from "./components/NotesDB";
-import Upload from "./components/Upload";
-import Categories from "./components/Categories";
-import Footer from "./components/Footer";
+import Header from "./pages/header";
+import Homepage from "./pages/homepage";
+import NotesDB from "./pages/notesdb";
+import Upload from "./pages/upload";
+import Categories from "./pages/categories";
+import Footer from "./pages/footer";
 import "./App.css";
 
 function App() {
