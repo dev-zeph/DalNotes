@@ -47,7 +47,7 @@ app.get("/api/notes", async (req, res) => {
 
   try {
     const notesQuery = `
-      SELECT id, title, course, author, created_at, file_url 
+      SELECT id, title, course, author, created_at, file_url, user_id, likes_count
       FROM note 
       LIMIT $1 OFFSET $2
     `;
@@ -67,6 +67,9 @@ app.get("/api/notes", async (req, res) => {
         Author: note.author,
         Date: note.created_at,
         File: note.file_url ? [{ url: note.file_url }] : [],
+        UserId: note.user_id,
+        LikesCount: note.likes_count || 0,
+        Liked: false, // Default to false; frontend will manage this state
       })),
       meta: {
         pagination: {
@@ -100,7 +103,7 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
       Key: `${Date.now()}-${file.originalname}`,
       Body: file.buffer,
       ContentType: file.mimetype,
-      // Removed ACL: "public-read" - we'll use a bucket policy instead
+      ContentDisposition: `attachment; filename="${file.originalname}"`,
     };
     const s3Result = await s3.upload(s3Params).promise();
     const fileUrl = s3Result.Location;
@@ -108,8 +111,8 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
 
     console.log("Saving to database...");
     const query = `
-      INSERT INTO note (title, course, author, file_url, created_at)
-      VALUES ($1, $2, $3, $4, NOW())
+      INSERT INTO note (title, course, author, file_url, created_at, user_id, likes_count)
+      VALUES ($1, $2, $3, $4, NOW(), NULL, 0)
       RETURNING *
     `;
     const values = [title, course, author, fileUrl];
@@ -125,11 +128,60 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
         Author: result.rows[0].author,
         Date: result.rows[0].created_at,
         File: [{ url: fileUrl }],
+        UserId: result.rows[0].user_id,
+        LikesCount: result.rows[0].likes_count || 0,
+        Liked: false,
       },
     });
   } catch (error) {
     console.error("Error uploading note:", error.stack);
     res.status(500).json({ error: "Failed to upload note", details: error.message });
+  }
+});
+
+app.post("/api/notes/:id/like", async (req, res) => {
+  const noteId = parseInt(req.params.id);
+
+  try {
+    // Check if the note exists
+    const noteCheck = await pool.query("SELECT 1 FROM note WHERE id = $1", [noteId]);
+    if (noteCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+
+    // Increment the likes_count
+    await pool.query(
+      "UPDATE note SET likes_count = likes_count + 1 WHERE id = $1",
+      [noteId]
+    );
+
+    res.status(200).json({ message: "Note liked successfully" });
+  } catch (error) {
+    console.error("Error liking note:", error);
+    res.status(500).json({ error: "Failed to like note", details: error.message });
+  }
+});
+
+app.delete("/api/notes/:id/like", async (req, res) => {
+  const noteId = parseInt(req.params.id);
+
+  try {
+    // Check if the note exists
+    const noteCheck = await pool.query("SELECT 1 FROM note WHERE id = $1", [noteId]);
+    if (noteCheck.rows.length === 0) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+
+    // Decrement the likes_count (ensure it doesn't go below 0)
+    await pool.query(
+      "UPDATE note SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = $1",
+      [noteId]
+    );
+
+    res.status(200).json({ message: "Note unliked successfully" });
+  } catch (error) {
+    console.error("Error unliking note:", error);
+    res.status(500).json({ error: "Failed to unlike note", details: error.message });
   }
 });
 
