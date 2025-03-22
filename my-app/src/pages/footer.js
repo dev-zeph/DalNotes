@@ -1,8 +1,10 @@
 import React from "react";
 import "../App.css";
+import { Link, useLocation } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const location = useLocation(); // Get current route
   
   return (
     <footer className="site-footer">
@@ -15,10 +17,39 @@ const Footer = () => {
         <div className="footer-section links">
           <h3>Quick Links</h3>
           <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#categories">Categories</a></li>
-            <li><a href="#notes">Notes</a></li>
-            <li><a href="#upload">Upload</a></li>
+            <li>
+              <Link
+              to="/"
+              className={location.pathname === "/" ? "active" : ""}
+            >
+              Home
+            </Link>
+            </li>
+            <li>
+              <Link
+              to="/categories"
+              className={location.pathname === "/categories" ? "active" : ""}
+            >
+              Categories
+            </Link></li>
+            <li>
+              <Link
+              to="/notes"
+              className={location.pathname === "/notes" ? "active" : ""}
+            >
+              Notes
+            </Link>
+            </li>
+            <li>
+              
+            <Link
+              to="/upload"
+              className={location.pathname === "/upload" ? "active" : ""}
+            >
+              Upload
+            </Link>
+            
+            </li>
           </ul>
         </div>
         
