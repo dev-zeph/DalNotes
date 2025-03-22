@@ -401,6 +401,61 @@ ul li a:hover {
   transform: translateY(-2px);
 }
 
+/* Like/Unlike/Delete Buttons */
+.like-btn,
+.unlike-btn,
+.delete-btn {
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 10px; /* Space between buttons */
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+}
+
+.like-btn {
+  background-color: #28a745; /* Green for Like */
+  color: white;
+}
+
+.like-btn:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.unlike-btn {
+  background-color: #dc3545; /* Red for Unlike */
+  color: white;
+}
+
+.unlike-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+.delete-btn {
+  background-color: #e63946; /* Slightly different red for Delete */
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #d00000;
+  transform: translateY(-2px);
+}
+
+/* Disabled state for buttons */
+.like-btn:disabled,
+.unlike-btn:disabled,
+.delete-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Notes Database Section */
 .notes-section {
   text-align: center;
@@ -832,5 +887,297 @@ ul li a:hover {
   
   .form-group input {
     width: 100%;
+  }
+}
+/* Dashboard Section */
+.dashboard {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 40px 20px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--primary-black);
+  margin-bottom: 10px;
+}
+
+.dashboard-header p {
+  font-size: 16px;
+  color: var(--text-gray);
+}
+
+.dashboard-stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  width: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-black);
+  margin-bottom: 10px;
+}
+
+.stat-card p {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-yellow);
+}
+
+.dashboard-table {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.dashboard-table h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary-black);
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.notes-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.notes-table th,
+.notes-table td {
+  padding: 15px;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+}
+
+.notes-table th {
+  background-color: var(--primary-black);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.notes-table td {
+  border-bottom: 1px solid #eee;
+}
+
+.notes-table tr:last-child td {
+  border-bottom: none;
+}
+
+.notes-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.notes-table .view-btn,
+.notes-table .delete-btn {
+  margin: 0 5px;
+}
+
+.dashboard-message {
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-gray);
+  padding: 20px;
+}
+
+/* Responsive Styles for Dashboard */
+@media (max-width: 992px) {
+  .dashboard {
+    padding: 30px 15px;
+    margin: 40px auto;
+  }
+
+  .dashboard-stats {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .stat-card {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .notes-table th,
+  .notes-table td {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header h1 {
+    font-size: 28px;
+  }
+
+  .dashboard-table h2 {
+    font-size: 24px;
+  }
+
+  .notes-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .notes-table th,
+  .notes-table td {
+    min-width: 120px;
+  }
+}
+
+/* Header Styles (Existing) */
+header {
+  background-color: var(--primary-black);
+  color: white;
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+ul {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+ul li a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+ul li a:hover {
+  background: var(--primary-yellow);
+  color: var(--primary-black);
+}
+
+/* New Styles for Navbar */
+.user-welcome {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: #ddd;
+  padding: 10px 20px;
+}
+
+.nav-btn {
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+}
+
+.login-btn {
+  background-color: var(--primary-yellow);
+  color: var(--primary-black);
+}
+
+.login-btn:hover {
+  background-color: #e6b800; /* Slightly darker yellow */
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background-color: #e63946; /* Red for logout */
+  color: white;
+}
+
+.logout-btn:hover {
+  background-color: #d00000;
+  transform: translateY(-2px);
+}
+
+/* Responsive Styles for Header (Updated) */
+@media (max-width: 768px) {
+  nav {
+    padding: 0 15px;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 0;
+  }
+  
+  ul li a,
+  .user-welcome,
+  .nav-btn {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 24px;
+  }
+
+  ul li a,
+  .user-welcome,
+  .nav-btn {
+    padding: 6px 12px;
+    font-size: 13px;
   }
 }

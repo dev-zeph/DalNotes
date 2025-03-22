@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useAuth0 } from "@auth0/auth0-react";
 import "../App.css";
 
 const Upload = () => {
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [formData, setFormData] = useState({
     file: null,
     fileName: "Drag or Choose PDF",
@@ -13,7 +15,7 @@ const Upload = () => {
 
   const [uploading, setUploading] = useState(false);
 
-  const backendUrl = "https://dalnotes-production.up.railway.app"; // Railway backend
+  const backendUrl = "https://dalnotes-production.up.railway.app";
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -34,14 +36,20 @@ const Upload = () => {
   const handleUpload = async (e) => {
     e.preventDefault();
 
-    if (!formData.file) {
-      alert("Please select a file before uploading.");
+    if (!isAuthenticated) {
+      alert("Please log in to upload notes.");
+      return;
+    }
+
+    if (!formData.file || !formData.title || !formData.course || !formData.author) {
+      alert("Please fill in all fields and select a file.");
       return;
     }
 
     setUploading(true);
 
     try {
+      const token = await getAccessTokenSilently();
       const uploadData = new FormData();
       uploadData.append("file", formData.file);
       uploadData.append("title", formData.title);
@@ -50,6 +58,7 @@ const Upload = () => {
 
       await axios.post(`${backendUrl}/api/notes`, uploadData, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -64,10 +73,20 @@ const Upload = () => {
       });
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("Error uploading file. Please try again.");
+      alert("Error uploading file: " + (error.response?.data?.error || error.message));
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleCancel = () => {
+    setFormData({
+      file: null,
+      fileName: "Drag or Choose PDF",
+      course: "",
+      title: "",
+      author: "",
+    });
   };
 
   return (
@@ -78,10 +97,9 @@ const Upload = () => {
       </div>
 
       <form className="upload-form" onSubmit={handleUpload}>
-        {/* Two-Column Input Layout */}
         <div className="form-grid">
           <label className="file-upload">
-            {formData.fileName} {/* ✅ Display selected file name */}
+            {formData.fileName}
             <input type="file" name="file" onChange={handleChange} accept=".pdf" />
           </label>
 
@@ -101,12 +119,13 @@ const Upload = () => {
           </div>
         </div>
 
-        {/* Upload & Cancel Buttons */}
         <div className="upload-buttons">
           <button type="submit" className="upload-btn" disabled={uploading}>
             {uploading ? "Uploading..." : "Upload"}
           </button>
-          <button type="button" className="cancel-btn">Cancel</button>
+          <button type="button" className="cancel-btn" onClick={handleCancel}>
+            Cancel
+          </button>
         </div>
       </form>
     </section>
