@@ -47,7 +47,7 @@ app.get("/api/notes", async (req, res) => {
 
   try {
     const notesQuery = `
-      SELECT id, title, course, author, created_at, file_url, user_id, likes_count
+      SELECT id, title, course, author, created_at, file_url, user_id, likes_count, category
       FROM note 
       LIMIT $1 OFFSET $2
     `;
@@ -70,6 +70,7 @@ app.get("/api/notes", async (req, res) => {
         UserId: note.user_id,
         LikesCount: note.likes_count || 0,
         Liked: false, // Default to false; frontend will manage this state
+        Category: note.category || "Other", // Include category, default to "Other" if null
       })),
       meta: {
         pagination: {
@@ -89,10 +90,10 @@ app.get("/api/notes", async (req, res) => {
 });
 
 app.post("/api/notes", upload.single("file"), async (req, res) => {
-  const { title, course, author } = req.body;
+  const { title, course, author, category } = req.body; // Add category
   const file = req.file;
 
-  if (!file || !title || !course || !author) {
+  if (!file || !title || !course || !author || !category) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -111,11 +112,11 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
 
     console.log("Saving to database...");
     const query = `
-      INSERT INTO note (title, course, author, file_url, created_at, user_id, likes_count)
-      VALUES ($1, $2, $3, $4, NOW(), NULL, 0)
+      INSERT INTO note (title, course, author, file_url, created_at, user_id, likes_count, category)
+      VALUES ($1, $2, $3, $4, NOW(), NULL, 0, $5)
       RETURNING *
     `;
-    const values = [title, course, author, fileUrl];
+    const values = [title, course, author, fileUrl, category];
     const result = await pool.query(query, values);
     console.log("Database save successful:", result.rows[0]);
 
@@ -131,6 +132,7 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
         UserId: result.rows[0].user_id,
         LikesCount: result.rows[0].likes_count || 0,
         Liked: false,
+        Category: result.rows[0].category, // Include category in response
       },
     });
   } catch (error) {
