@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
-const AWS = require("aws-sdk");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3"); // Import AWS SDK v3
 require("dotenv").config();
 const pool = require("./db");
 
@@ -11,10 +11,13 @@ const PORT = process.env.PORT || 8080;
 app.use(cors({ origin: "https://dal-notes.vercel.app" }));
 app.use(express.json());
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+// Configure S3 client with AWS SDK v3
+const s3Client = new S3Client({
   region: "us-east-2",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -69,8 +72,8 @@ app.get("/api/notes", async (req, res) => {
         File: note.file_url ? [{ url: note.file_url }] : [],
         UserId: note.user_id,
         LikesCount: note.likes_count || 0,
-        Liked: false, // Default to false; frontend will manage this state
-        Category: note.category || "Other", // Include category, default to "Other" if null
+        Liked: false,
+        Category: note.category || "Other",
       })),
       meta: {
         pagination: {
@@ -90,7 +93,7 @@ app.get("/api/notes", async (req, res) => {
 });
 
 app.post("/api/notes", upload.single("file"), async (req, res) => {
-  const { title, course, author, category } = req.body; // Add category
+  const { title, course, author, category } = req.body;
   const file = req.file;
 
   if (!file || !title || !course || !author || !category) {
@@ -106,8 +109,9 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
       ContentType: file.mimetype,
       ContentDisposition: `attachment; filename="${file.originalname}"`,
     };
-    const s3Result = await s3.upload(s3Params).promise();
-    const fileUrl = s3Result.Location;
+    const command = new PutObjectCommand(s3Params);
+    const s3Result = await s3Client.send(command);
+    const fileUrl = `https://${s3Params.Bucket}.s3.${s3Client.config.region}.amazonaws.com/${s3Params.Key}`;
     console.log("S3 upload successful:", fileUrl);
 
     console.log("Saving to database...");
@@ -132,7 +136,7 @@ app.post("/api/notes", upload.single("file"), async (req, res) => {
         UserId: result.rows[0].user_id,
         LikesCount: result.rows[0].likes_count || 0,
         Liked: false,
-        Category: result.rows[0].category, // Include category in response
+        Category: result.rows[0].category,
       },
     });
   } catch (error) {
@@ -145,13 +149,11 @@ app.post("/api/notes/:id/like", async (req, res) => {
   const noteId = parseInt(req.params.id);
 
   try {
-    // Check if the note exists
     const noteCheck = await pool.query("SELECT 1 FROM note WHERE id = $1", [noteId]);
     if (noteCheck.rows.length === 0) {
       return res.status(404).json({ error: "Note not found" });
     }
 
-    // Increment the likes_count
     await pool.query(
       "UPDATE note SET likes_count = likes_count + 1 WHERE id = $1",
       [noteId]
@@ -168,13 +170,11 @@ app.delete("/api/notes/:id/like", async (req, res) => {
   const noteId = parseInt(req.params.id);
 
   try {
-    // Check if the note exists
     const noteCheck = await pool.query("SELECT 1 FROM note WHERE id = $1", [noteId]);
     if (noteCheck.rows.length === 0) {
       return res.status(404).json({ error: "Note not found" });
     }
 
-    // Decrement the likes_count (ensure it doesn't go below 0)
     await pool.query(
       "UPDATE note SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = $1",
       [noteId]
