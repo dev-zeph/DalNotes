@@ -56,7 +56,7 @@ const Footer = () => {
         <div className="footer-section contact">
           <h3>Contact</h3>
           <p>Have questions or suggestions?</p>
-          <a href="mailto:contact@dalnotes.com" className="contact-link">zephchizulu@gmail.com</a>
+          <a href="mailto:contact@dalnotes.com" className="contact-link">dalnotes@gmail.com</a>
         </div>
       </div>
       
