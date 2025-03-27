@@ -1,14 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "axios";
 import "../App.css";
 
-const Upload = () => {
+const Upload = ({ onUploadSuccess }) => { // Add onUploadSuccess prop
   const [title, setTitle] = useState("");
   const [course, setCourse] = useState("");
   const [author, setAuthor] = useState("");
-  const [category, setCategory] = useState(""); // Add category state
+  const [category, setCategory] = useState("");
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate(); // Add navigate hook
 
   const categories = [
     "Math",
@@ -38,7 +40,7 @@ const Upload = () => {
     formData.append("title", title);
     formData.append("course", course);
     formData.append("author", author);
-    formData.append("category", category); // Add category to form data
+    formData.append("category", category);
     formData.append("file", file);
 
     setUploading(true);
@@ -56,6 +58,8 @@ const Upload = () => {
       setAuthor("");
       setCategory("");
       setFile(null);
+      navigate("/notes"); // Navigate to /notes after upload
+      if (onUploadSuccess) onUploadSuccess(); // Call callback to reset filters
     } catch (error) {
       console.error("Error uploading note:", error);
       alert("Failed to upload note: " + (error.response?.data?.error || error.message));

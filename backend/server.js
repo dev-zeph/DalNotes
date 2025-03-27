@@ -45,10 +45,14 @@ app.get("/api/notes", async (req, res) => {
   const pageSize = parseInt(req.query["pagination[pageSize]"]) || 6;
   const offset = (page - 1) * pageSize;
 
+  // Disable caching
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+
   try {
     const notesQuery = `
       SELECT id, title, course, author, created_at, file_url, user_id, likes_count, category
       FROM note 
+      ORDER BY created_at DESC
       LIMIT $1 OFFSET $2
     `;
     const countQuery = "SELECT COUNT(*) FROM note";

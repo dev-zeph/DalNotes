@@ -15,6 +15,10 @@ function App() {
     setSelectedCategory(category);
   };
 
+  const handleUploadSuccess = () => {
+    setSelectedCategory(""); // Reset category filter after upload
+  };
+
   return (
     <Router>
       <div className="App">
@@ -38,7 +42,12 @@ function App() {
               />
             }
           />
-          <Route path="/upload" element={<Upload />} />
+          <Route
+            path="/upload"
+            element={
+              <Upload onUploadSuccess={handleUploadSuccess} />
+            }
+          />
         </Routes>
         <Footer />
       </div>

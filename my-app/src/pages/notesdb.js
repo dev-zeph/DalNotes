@@ -34,6 +34,7 @@ const NotesDB = ({ selectedCategory }) => {
         );
       }
 
+      console.log("Filtered Notes:", filtered); // Log filtered notes
       setFilteredNotes(filtered);
     },
     [notes, selectedCategory]
@@ -44,20 +45,22 @@ const NotesDB = ({ selectedCategory }) => {
   }, [currentPage, backendUrl]);
 
   useEffect(() => {
+    setCurrentPage(1); // Reset to page 1 when selectedCategory changes
     handleSearch(searchQuery); // Re-filter when selectedCategory changes
   }, [selectedCategory, handleSearch]);
 
   const fetchNotes = (page) => {
     axios
       .get(
-        `${backendUrl}/api/notes?pagination[page]=${page}&pagination[pageSize]=6&populate=File`
+        `${backendUrl}/api/notes?pagination[page]=${page}&pagination[pageSize]=6` // Removed populate=File
       )
       .then((response) => {
-        console.log("API Response:", response.data);
+        console.log("Fetched Notes:", response.data.data); // Log fetched notes
         if (response.data.data) {
           setNotes(response.data.data);
           setFilteredNotes(response.data.data);
           setTotalPages(response.data.meta.pagination.pageCount);
+          console.log("Updated Notes State:", response.data.data); // Log updated state
         } else {
           console.error("No data found in API response", response.data);
         }
@@ -71,7 +74,7 @@ const NotesDB = ({ selectedCategory }) => {
       return;
     }
 
-    const fileUrl = file[0].url; // Use the full URL from file_url
+    const fileUrl = file[0].url;
     console.log("Downloading from:", fileUrl);
     axios({
       url: fileUrl,
