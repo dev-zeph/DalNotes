@@ -45,7 +45,7 @@ app.get("/api/notes", async (req, res) => {
   const pageSize = parseInt(req.query["pagination[pageSize]"]) || 6;
   const offset = (page - 1) * pageSize;
 
-  // Disable caching
+  // Disable cachings
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
 
   try {
